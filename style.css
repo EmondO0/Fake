@@ -14,6 +14,19 @@ body {
     width: 100%;
 }
 
+/* تشويش */
+#glitch-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+/* صور الـ GIF */
 #gif-container {
     position: absolute;
     width: 100%;
@@ -22,16 +35,20 @@ body {
     justify-content: center;
     align-items: center;
     opacity: 0;
+    transition: opacity 0.5s;
 }
 
-#static-gif {
+#glitch-gif, #static-gif {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: flicker 0.1s infinite alternate;
 }
 
 @keyframes flicker {
     0% { opacity: 0.1; }
     100% { opacity: 1; }
+}
+
+#static-gif {
+    animation: flicker 0.1s infinite alternate;
 }

